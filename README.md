@@ -20,9 +20,17 @@ CONVOOPS is a conversational operations platform that gives businesses AI employ
 - Meta WhatsApp Cloud API (next integration)
 - OpenAI agent/tool calling (next integration)
 
+## Live backend
+- Supabase project: `convoops`
+- Project ref: `krvymmfzpemhngrrbhfs`
+- Region: `eu-north-1`
+- API URL: `https://krvymmfzpemhngrrbhfs.supabase.co`
+- RLS enabled on all business tables
+- Security advisor: clean at initial setup
+
 ## Setup
 1. Copy `.env.example` to `.env.local`.
-2. Add Supabase URL and publishable key.
-3. Apply `supabase/schema.sql` to a fresh Supabase project.
+2. Add the Supabase URL and publishable key.
+3. Apply `supabase/schema.sql` and migrations only when provisioning another environment.
 4. Install dependencies with `npm install`.
 5. Run `npm run dev`.
