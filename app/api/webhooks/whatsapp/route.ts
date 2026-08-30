@@ -62,7 +62,6 @@ export async function POST(request: NextRequest) {
   const inbound = change?.messages?.[0]
   const phoneNumberId = change?.metadata?.phone_number_id
 
-  // Delivery/read receipts and other webhook events do not contain a customer message.
   if (!inbound || !phoneNumberId) {
     return NextResponse.json({ received: true })
   }
@@ -220,7 +219,7 @@ export async function POST(request: NextRequest) {
       sender_type: 'ai',
       body: reply,
       provider_message_id: outboundProviderMessageId,
-      metadata: { model: process.env.OPENAI_MODEL || 'gpt-5' }
+      metadata: { model: process.env.AI_MODEL || 'openai/gpt-5.6-sol' }
     })
 
     if (outboundError) throw outboundError
