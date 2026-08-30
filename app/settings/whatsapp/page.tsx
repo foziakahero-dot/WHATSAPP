@@ -77,7 +77,19 @@ export default function WhatsAppSettingsPage() {
         { onConflict: 'provider,phone_number_id' }
       )
 
-    if (error) setStatus(error.message)
+    if (error) {
+      setStatus(error.message)
+      setLoading(false)
+      return
+    }
+
+    const { error: agentError } = await supabase
+      .from('agents')
+      .update({ status: 'active', updated_at: new Date().toISOString() })
+      .eq('organization_id', organizationId)
+      .eq('status', 'draft')
+
+    if (agentError) setStatus(agentError.message)
     else setStatus('active')
 
     setLoading(false)
@@ -116,7 +128,7 @@ export default function WhatsAppSettingsPage() {
 
           {status ? (
             <p className={status === 'active' ? 'status' : 'muted'}>
-              {status === 'active' ? 'WhatsApp channel registered. Server credentials are the final connection step.' : status}
+              {status === 'active' ? 'WhatsApp channel registered and Maya activated. Server credentials are the final connection step.' : status}
             </p>
           ) : null}
         </form>
