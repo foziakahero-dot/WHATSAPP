@@ -34,10 +34,28 @@ export default function SetupPage() {
       return
     }
 
-    const { error } = await supabase.rpc('create_organization', {
-      org_name: name,
-      org_slug: slug
-    })
+    const { data: membership, error: membershipError } = await supabase
+      .from('organization_members')
+      .select('organization_id, role')
+      .eq('user_id', auth.user.id)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+
+    if (membershipError || !membership) {
+      setMessage(membershipError?.message || 'Your workspace is still being provisioned. Try again.')
+      setLoading(false)
+      return
+    }
+
+    const { error } = await supabase
+      .from('organizations')
+      .update({
+        name: name.trim(),
+        slug,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', membership.organization_id)
 
     if (error) {
       setMessage(error.message)
@@ -46,13 +64,14 @@ export default function SetupPage() {
     }
 
     router.push('/dashboard')
+    router.refresh()
   }
 
   return (
     <main style={{ maxWidth: 620, margin: '60px auto', padding: 24 }}>
       <div className="eyebrow">Workspace setup</div>
       <h1>Tell CONVOOPS about your business</h1>
-      <p className="muted">This creates your private workspace and your first AI employee, Maya.</p>
+      <p className="muted">Your private workspace and first AI employee are already provisioned. Add your business identity to continue.</p>
 
       <form onSubmit={submit} className="card" style={{ display: 'grid', gap: 16, marginTop: 24 }}>
         <label>
@@ -72,7 +91,7 @@ export default function SetupPage() {
         </div>
 
         <button className="button" disabled={loading} type="submit">
-          {loading ? 'Creating workspace…' : 'Create workspace'}
+          {loading ? 'Saving workspace…' : 'Continue to dashboard'}
         </button>
         {message ? <p className="muted">{message}</p> : null}
       </form>
