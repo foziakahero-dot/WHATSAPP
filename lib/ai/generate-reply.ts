@@ -1,4 +1,5 @@
 import 'server-only'
+import { generateText } from 'ai'
 
 type Message = {
   sender_type: 'customer' | 'ai' | 'human' | 'system'
@@ -16,23 +17,6 @@ type KnowledgeSource = {
   content: string | null
 }
 
-function extractOutputText(payload: any): string {
-  if (typeof payload?.output_text === 'string' && payload.output_text.trim()) {
-    return payload.output_text.trim()
-  }
-
-  const chunks: string[] = []
-  for (const item of payload?.output ?? []) {
-    for (const content of item?.content ?? []) {
-      if ((content?.type === 'output_text' || content?.type === 'text') && typeof content?.text === 'string') {
-        chunks.push(content.text)
-      }
-    }
-  }
-
-  return chunks.join('\n').trim()
-}
-
 export async function generateAgentReply({
   agent,
   history,
@@ -44,13 +28,6 @@ export async function generateAgentReply({
   knowledge: KnowledgeSource[]
   customerMessage: string
 }) {
-  const apiKey = process.env.OPENAI_API_KEY
-  const model = process.env.OPENAI_MODEL || 'gpt-5'
-
-  if (!apiKey) {
-    throw new Error('Missing OPENAI_API_KEY')
-  }
-
   const knowledgeText = knowledge
     .filter((source) => source.content)
     .map((source) => `# ${source.title || 'Business knowledge'}\n${source.content}`)
@@ -66,7 +43,7 @@ export async function generateAgentReply({
     })
     .join('\n')
 
-  const instructions = [
+  const system = [
     `You are ${agent.name}, the ${agent.role} for this business.`,
     'Reply in the same language as the customer unless they explicitly request another language.',
     'Be concise, helpful, warm, and commercially useful.',
@@ -80,31 +57,14 @@ export async function generateAgentReply({
     .filter(Boolean)
     .join('\n')
 
-  const response = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model,
-      instructions,
-      input: customerMessage,
-      max_output_tokens: 500
-    })
+  const { text } = await generateText({
+    model: process.env.AI_MODEL || 'openai/gpt-5.6-sol',
+    system,
+    prompt: customerMessage,
+    maxOutputTokens: 500
   })
 
-  if (!response.ok) {
-    const detail = await response.text()
-    throw new Error(`OpenAI response failed (${response.status}): ${detail.slice(0, 500)}`)
-  }
-
-  const payload = await response.json()
-  const reply = extractOutputText(payload)
-
-  if (!reply) {
-    throw new Error('OpenAI returned an empty reply')
-  }
-
+  const reply = text.trim()
+  if (!reply) throw new Error('AI Gateway returned an empty reply')
   return reply
 }
