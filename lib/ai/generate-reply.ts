@@ -34,7 +34,11 @@ export async function generateAgentReply({
     .join('\n\n')
     .slice(0, 12000)
 
-  const transcript = history
+  const transcriptMessages = history.at(-1)?.sender_type === 'customer' && history.at(-1)?.body?.trim() === customerMessage.trim()
+    ? history.slice(0, -1)
+    : history
+
+  const transcript = transcriptMessages
     .filter((message) => message.body)
     .slice(-16)
     .map((message) => {

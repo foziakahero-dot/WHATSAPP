@@ -1,12 +1,18 @@
 import Link from 'next/link'
 
 export default function Home() {
-  return <main>
-    <section className="hero">
-      <div className="eyebrow">Conversational Operations</div>
-      <h1>Talk. Act. Done.</h1>
-      <p className="sub">CONVOOPS gives businesses an AI employee inside WhatsApp that answers, qualifies, books, follows up and hands off to humans when needed.</p>
-      <Link className="cta" href="/dashboard">Open MVP dashboard →</Link>
-    </section>
-  </main>
+  return <div className="marketing">
+    <header className="marketing-nav"><Link href="/" className="brand">CONVO<span>OPS</span></Link><nav><a href="#product">Product</a><a href="#workforce">AI Employees</a><a href="#integrations">Integrations</a><a href="#pricing">Pricing</a></nav><div><Link href="/login">Sign in</Link><Link className="primary-button" href="/login">Start free</Link></div></header>
+    <main className="marketing-main">
+      <section className="hero"><div><div className="eyebrow">Conversational operations</div><h1>Your AI workforce for customer conversations.</h1><p className="sub">Turn WhatsApp conversations into qualified leads, bookings and completed business actions — automatically, in the customer&apos;s language.</p><div className="hero-actions"><Link className="primary-button" href="/login">Start free</Link><Link className="secondary-button" href="/app/overview">See live product</Link></div><small>EN · NO · ES · AR · UR &nbsp; · &nbsp; RTL-ready &nbsp; · &nbsp; Multilingual by default</small></div>
+        <div className="chat-demo panel"><div className="chat-head"><span className="avatar small">M</span><div><strong>Maya</strong><small>AI Receptionist · Active</small></div><span className="live-pill">● Live</span></div><p className="bubble customer">Hi, do you have anything available tomorrow after 2 PM?</p><p className="bubble ai">Yes — 15:30 is available. Would you like me to book it for you?</p><p className="bubble customer">Yes please.</p><div className="outcomes"><span><b>Lead</b>Qualified</span><span><b>Booking</b>15:30 created</span><span><b>Dashboard</b>Updated</span></div></div>
+      </section>
+      <section className="principle"><span>Core principle</span><h2>“We don&apos;t automate messages.<br/>We automate the work that starts with a message.”</h2></section>
+      <section id="product" className="marketing-section"><div className="eyebrow">What CONVOOPS does</div><h2>One conversation. Multiple business outcomes.</h2><div className="marketing-grid">{[['◎','Answer','Grounded answers from company knowledge.'],['◇','Qualify','Capture intent, customer information and lead quality.'],['□','Book','Check availability and create appointments.'],['◉','Handoff','Move to a human when authority or confidence is missing.']].map(([i,t,d])=><article className="panel" key={t}><span className="icon-box">{i}</span><h3>{t}</h3><p>{d}</p></article>)}</div></section>
+      <section id="workforce" className="marketing-section split-section"><div><div className="eyebrow">AI workforce</div><h2>Start with a receptionist. Grow into an AI workforce.</h2><p>Maya handles the front desk today. Add specialist employees for sales, booking and support as your operation grows.</p></div><div className="employee-stack">{[['M','Maya','Receptionist','Available now'],['A','Alex','Sales','Coming next'],['N','Nora','Booking','Coming next']].map(([a,n,r,s],i)=><article className={`employee-row ${i===0?'active':''}`} key={n}><span className="avatar small">{a}</span><div><strong>{n}</strong><small>{r}</small></div><span>{s}</span></article>)}</div></section>
+      <section id="integrations" className="marketing-section"><div className="eyebrow">Integrations</div><h2>Connect the tools you already use.</h2><div className="marketing-grid">{['WhatsApp Business','Google Calendar','Stripe','HubSpot','Shopify','API / Webhooks'].map((x,i)=><article className="integration-card" key={x}><span>{['◎','□','◇','⌁','◫','⚡'][i]}</span><strong>{x}</strong><small>{i===0||i===5?'Available':'Planned'}</small></article>)}</div></section>
+      <section id="pricing" className="marketing-section"><div className="eyebrow">Pricing</div><h2>Simple, transparent pricing.</h2><div className="pricing-grid">{[['Launch','$49','1 AI employee · WhatsApp · Leads · Shared inbox'],['Growth','$149','3 AI employees · Bookings · Follow-ups · Integrations'],['Scale','$399','Multi-number · Advanced automation · Analytics · API']].map(([name,price,features],i)=><article className={`panel price-card ${i===1?'recommended':''}`} key={name}>{i===1&&<span className="live-pill">Recommended</span>}<h3>{name}</h3><strong>{price}<small>/mo</small></strong><p>{features}</p><Link className={i===1?'primary-button':'secondary-button'} href="/login">Get started</Link></article>)}</div></section>
+      <section className="final-cta"><div className="eyebrow">Talk. Act. Done.</div><h2>Hire your first AI employee.</h2><p>Connect WhatsApp, add your business knowledge and go live with Maya.</p><Link className="primary-button" href="/login">Start free</Link></section>
+    </main>
+  </div>
 }
