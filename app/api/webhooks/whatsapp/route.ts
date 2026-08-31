@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
         .from('messages')
         .select('sender_type, body, created_at')
         .eq('conversation_id', conversation.id)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })
         .limit(20),
       supabase
         .from('knowledge_sources')
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
     const reply = await generateAgentReply({
       agent: activeAgent,
-      history: (history || []) as any,
+      history: [...(history || [])].reverse() as any,
       knowledge: (knowledge || []) as any,
       customerMessage
     })

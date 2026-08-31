@@ -12,6 +12,11 @@ export default function LoginPage() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
+  function requestedDestination(fallback: string) {
+    const requested = new URLSearchParams(window.location.search).get('next')
+    return requested?.startsWith('/') && !requested.startsWith('//') ? requested : fallback
+  }
+
   async function submit(event: FormEvent) {
     event.preventDefault()
     setLoading(true)
@@ -20,25 +25,27 @@ export default function LoginPage() {
     const supabase = createClient()
 
     if (mode === 'signup') {
+      const callback = new URL('/auth/callback', window.location.origin)
+      callback.searchParams.set('next', requestedDestination('/setup'))
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: callback.toString()
         }
       })
 
       if (error) {
         setMessage(error.message)
       } else if (data.session) {
-        router.push('/setup')
+        router.push(requestedDestination('/setup'))
       } else {
         setMessage('Check your email to confirm your account, then continue.')
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) setMessage(error.message)
-      else router.push('/dashboard')
+      else router.push(requestedDestination('/dashboard'))
     }
 
     setLoading(false)
